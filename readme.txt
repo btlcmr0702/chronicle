@@ -1,1 +1,1 @@
-Timed update algorithm for switch in SDN
+Timed update algorithm for switch in SDN network.
