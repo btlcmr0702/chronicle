@@ -1,5 +1,6 @@
 import java.io.BufferedReader;
 import java.io.FileInputStream;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.util.ArrayList;
@@ -12,7 +13,8 @@ import java.util.Map;
 import java.util.Random;
 
 public class NodeOrdering {
-	
+	private static int numOfSwitch = 100;
+
 	public static int getRandom(int min,int max){
 		Random random = new Random();
 		int s = random.nextInt(max)%(max-min+1) + min;
@@ -63,7 +65,7 @@ public class NodeOrdering {
 	}
 	
 	public static int[][] calRules(HashMap<Link,Integer> linksMap,int endTiming){
-		int[][] rules = new int[endTiming+1][26];
+		int[][] rules = new int[endTiming+1][numOfSwitch+1];
 		for(int t=-1;t<endTiming-1;t++){
 			for(Map.Entry<Link,Integer> lEntry : linksMap.entrySet()){
 				Link link = lEntry.getKey();
@@ -82,7 +84,7 @@ public class NodeOrdering {
 		double[] maxCapa = new double[endT];
 			for(int t=0;t<endT;t++){
 				double tmpLoad = 0;
-				double [][] load = new double[26][26];
+				double [][] load = new double[numOfSwitch+1][numOfSwitch+1];
 				HashMap<Integer,Integer> congestedFlowsMap = new HashMap<Integer,Integer>();
 				for(Map.Entry<Link,Integer> lEntry : linksMap.entrySet()){
 					Link link = lEntry.getKey();
@@ -169,16 +171,21 @@ public class NodeOrdering {
 	
 	public static void main(String args[]) throws NumberFormatException, IOException {
 				
-		int t = 200;
-		double[] linkUtilz = new double[81];
-		double[] congestedflows = new double[81];
-		double[][] congestedSTDFlows = new double[81][81];
-		double[] ForRules = new double[81];
-		int flagT = 0;
-		//while(flagT<11){
 		
+		int Tcase=0;
+		while(Tcase<1) {
+			long start_Time=System.currentTimeMillis();//记录开始时间  
+
+		int t = 200;
+		double[] linkUtilz = new double[120];
+		double[] congestedflows = new double[120];
+		double[][] congestedSTDFlows = new double[120][120];
+		double[] ForRules = new double[120];
+		int flagT = 0;
+		//while(flagT<20){
+
 				int [][]flows = new int[10000][];
-				String filePath = "input_flow_100_useful.txt";
+				String filePath = "input_flow_1000.txt";
 		
 				BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)));  
 				
@@ -198,7 +205,7 @@ public class NodeOrdering {
 				//double [] throughput={0,1,1};  // 0,throughput of flow1, throughput of flow2.....
 				double [] throughput = new double[cnt/2+1];
 				int throughtIndex = 1;
-				filePath = "throughput_100_useful.txt";
+				filePath = "throughput_1000.txt";
 				br = new BufferedReader(new InputStreamReader(  
 			             new FileInputStream(filePath)));  
 				 for (String line = br.readLine(); line != null; line = br.readLine()) {  
@@ -208,8 +215,9 @@ public class NodeOrdering {
 				     }
 				 
 				 
-				 double[][] delay = new double[26][26];
-				 filePath = "delay.txt";
+				 double[][] delay = new double[numOfSwitch+1][numOfSwitch+1];
+				 
+				filePath = "delay_100.txt";
 					br = new BufferedReader(new InputStreamReader(  
 				             new FileInputStream(filePath)));  
 					 for (String line = br.readLine(); line != null; line = br.readLine()) {  
@@ -227,7 +235,7 @@ public class NodeOrdering {
 				}*/
 			
 				Topology topology = new Topology();
-				topology.init(25,6.3,1);
+				topology.init(numOfSwitch,6.3,1);
 				//double [][] delay = topology.getDelay();
 				double [][] bandWidth = topology.getBandWidth();
 	
@@ -298,7 +306,7 @@ public class NodeOrdering {
 							flowid++;   
 							startFlag = true;
 							endFlag = false;
-							startTime = -80;   //initial flow all start from the past
+							startTime = -110;   //initial flow all start from the past
 							endTime = updateTiming.get(flowid-1);  //initial flow all end before updating
 							//endTime = 0;
 						}else{	         	    	  //final flow
@@ -306,7 +314,7 @@ public class NodeOrdering {
 							endFlag = true;		
 							startTime = updateTiming.get(flowid-1);  //final flow start from update timing 
 							//startTime = 0;
-							endTime=80;   //final flow end at set time
+							endTime=110;   //final flow end at set time
 						}
 						for(int i=startTime;i<endTime;i++){
 							 startTiming = i;
@@ -372,7 +380,7 @@ public class NodeOrdering {
 					int maxNum =0;
 					for(int i=0;i<maxCapa.length;i++){
 						//System.out.println(i+" "+maxCapa[i]);
-						if(maxCapa[i] >= 1.12){
+						if(maxCapa[i] >= 1.0){
 							maxNum++;
 						}
 					}
@@ -402,7 +410,7 @@ public class NodeOrdering {
 						//System.out.println(i+" "+max);
 					}
 					
-					if(c>=5){
+					if(c>=0){
 						System.out.println("NODE find a solution"+" cur num of solution is:"+flagT+" turn is:"+(200-t));
 						flagT++;
 						for(int i=0;i<maxCapa.length;i++){
@@ -427,36 +435,50 @@ public class NodeOrdering {
 					}
 					
 					t--;
-/*	}
+	//}
 		
 		for(int i=0;i<linkUtilz.length;i++){
-			System.out.println(linkUtilz[i]/flagT);
+		//	System.out.println(linkUtilz[i]/flagT);
 		}
 		System.out.println("##########################");
 		for(int i=0;i<congestedflows.length;i++){
-			if(congestedflows[i]>0)
-			System.out.println(i+" "+congestedflows[i]/flagT);
+			//if(congestedflows[i]>0)
+			//System.out.println(congestedflows[i]/flagT);
 		}
-		double[] max = new double[81];
+		double[] max = new double[120];
 		for(int tt=0;tt<flagT;tt++){
 			for(int j=0;j<congestedSTDFlows[tt].length;j++){
 				if(congestedSTDFlows[tt][j]>max[tt]){
-					max[tt] = congestedSTDFlows[tt][j];
+				//	max[tt] = congestedSTDFlows[tt][j];
 				}
 			}
 		}
 		for(int i=0;i<max.length;i++){
 			if(max[i]>0){
-				System.out.println(max[i]);
+				System.out.println("!!!"+max[i]);
 			}
 		}
 		
 		
 		System.out.println("##########################");
 		for(int i=0;i<ForRules.length;i++){
-			System.out.println(ForRules[i]/flagT);
+		//	System.out.println(ForRules[i]/flagT);
 		}
-	*/	
+		
+		
+		long end_Time=System.currentTimeMillis();//记录结束时间  
+		float excTime=(float)(end_Time-start_Time)/1000;  
+		System.out.println("执行时间："+excTime+"s");  
+
+		String filepath = "nop_runningtime.txt";
+		FileWriter fw1 = new FileWriter(filepath,true);
+		fw1.write(excTime+"\n");
+		fw1.flush();
+		
+		System.out.println("end");	
+		Tcase++;
+		}
+		
 	}
 
 }

@@ -72,7 +72,7 @@ public class matlabInput {
 				t+=input[i][j];
 			}	
 			if(t!=100){
-				System.out.println("wocao! i:"+i+" t:"+t);
+				System.out.println("! i:"+i+" t:"+t);
 				for(int k=1;k<input[i].length;k++){
 					if(input[i][k]!=0){
 						System.out.println("k:"+k+" value:"+input[i][k]);

@@ -1,6 +1,7 @@
 import java.io.BufferedReader;
 import java.io.FileInputStream;
 import java.io.FileNotFoundException;
+import java.io.FileWriter;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.sql.Array;
@@ -17,6 +18,10 @@ import java.util.Random;
 import org.w3c.dom.stylesheets.LinkStyle;
 
 public class TwoPhaseUpdate {
+	
+	private static int numOfSwitch = 100;
+
+	
 	public static int getRandom(int min,int max){
 		Random random = new Random();
 		int s = random.nextInt(max)%(max-min+1) + min;
@@ -172,7 +177,7 @@ public class TwoPhaseUpdate {
 		return rules;
 	}*/
 	public static int[][] calRules(HashMap<Link,Integer> linksMap,int endTiming){
-		int[][] rules = new int[endTiming+1][26];
+		int[][] rules = new int[endTiming+1][numOfSwitch+1];
 		for(int t=-1;t<endTiming-1;t++){
 			for(Map.Entry<Link,Integer> lEntry : linksMap.entrySet()){
 				Link link = lEntry.getKey();
@@ -190,7 +195,7 @@ public class TwoPhaseUpdate {
 		double[] maxCapa = new double[endT];
 			for(int t=0;t<endT;t++){
 				double tmpLoad = 0;
-				double [][] load = new double[26][26];
+				double [][] load = new double[numOfSwitch+1][numOfSwitch+1];
 				HashMap<Integer,Integer> congestedFlowsMap = new HashMap<Integer,Integer>();
 				for(Map.Entry<Link,Integer> lEntry : linksMap.entrySet()){
 					Link link = lEntry.getKey();
@@ -287,13 +292,17 @@ public class TwoPhaseUpdate {
 	}*/
 	
 	public static void main(String[] args) throws IOException {
+		int Tcase=0;
+		while(Tcase<1) {
+			long start_Time=System.currentTimeMillis();//记录开始时间 
+			
 		int t = 200;
 		double[] linkUtilz = new double[81];
 		double[] congestedflows = new double[81];
 		double[][] congestedSTDFlows = new double[81][81];
 		double[] ForRules = new double[81];
 		int flagT = 0;
-		while(flagT<11){
+		//while(flagT<11){
 		
 	/*	int [] redStartFlow = {1,3,4,5}; 
 		int [] greStartFlow = {1,2,5};
@@ -303,7 +312,7 @@ public class TwoPhaseUpdate {
 		//int [][] flows = {{1,3,4,5},{1,2,5},{1,2,5},{1,3,2,4,5}}; //start flow , end flow, start flow ,end flow ....
 		
 		int [][]flows = new int[10000][];
-		String filePath = "input_flow_500.txt";
+		String filePath = "input_flow_1000.txt";
 
 		BufferedReader br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)));  
 		
@@ -323,7 +332,7 @@ public class TwoPhaseUpdate {
 		//double [] throughput={0,1,1};  // 0,throughput of flow1, throughput of flow2.....
 		double [] throughput = new double[cnt/2+1];
 		int throughtIndex = 1;
-		filePath = "throughput_500.txt";
+		filePath = "throughput_1000.txt";
 		br = new BufferedReader(new InputStreamReader(  
 	             new FileInputStream(filePath)));  
 		 for (String line = br.readLine(); line != null; line = br.readLine()) {  
@@ -332,8 +341,8 @@ public class TwoPhaseUpdate {
 		    	throughtIndex++;
 		     }
 		 
-		 double[][] delay = new double[26][26];
-		 filePath = "delay.txt";
+		 double[][] delay = new double[numOfSwitch+1][numOfSwitch+1];
+		 filePath = "delay_100.txt";
 			br = new BufferedReader(new InputStreamReader(  
 		             new FileInputStream(filePath)));  
 			 for (String line = br.readLine(); line != null; line = br.readLine()) {  
@@ -350,7 +359,7 @@ public class TwoPhaseUpdate {
 		}*/
 	
 		Topology topology = new Topology();
-		topology.init(25,14.9,1);
+		topology.init(numOfSwitch,14.9,1);
 		//double [][] delay = topology.getDelay();
 		double [][] bandWidth = topology.getBandWidth();
 		
@@ -489,7 +498,7 @@ public class TwoPhaseUpdate {
 			//System.out.println(max);
 		}
 		
-		if(c>=5 ){
+		if(c>=0 ){
 			System.out.println("find a solution"+" cur num of solution is:"+flagT+" turn is:"+(200-t));
 			flagT++;
 			for(int i=0;i<maxCapa.length;i++){
@@ -515,7 +524,7 @@ public class TwoPhaseUpdate {
 		}
 		
 		t--;
-	}
+	//}
 	
 		
 		for(int i=0;i<linkUtilz.length;i++){
@@ -544,7 +553,21 @@ public class TwoPhaseUpdate {
 		
 		System.out.println("##########################");
 		for(int i=0;i<ForRules.length;i++){
-			System.out.println(ForRules[i]/flagT);
+			//System.out.println(ForRules[i]/flagT);
+		}
+		long end_Time=System.currentTimeMillis();//记录结束时间  
+		float excTime=(float)(end_Time-start_Time)/1000;  
+		System.out.println("执行时间："+excTime+"s");  
+
+		String filepath = "tpp_runningtime.txt";
+		FileWriter fw1 = new FileWriter(filepath,true);
+		fw1.write(excTime+"\n");
+		fw1.flush();
+		
+		System.out.println("end");	
+		Tcase++;
+		
+		
 		}
 		
 	}

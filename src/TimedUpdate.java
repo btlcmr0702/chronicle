@@ -30,6 +30,7 @@ import org.omg.PortableServer.ID_ASSIGNMENT_POLICY_ID;
 import org.w3c.dom.stylesheets.LinkStyle;
 
 public class TimedUpdate {
+	private static int numOfSwitch = 100;
 
 	public static void findsegmentsCandidate(Link[] tempLinks,HashMap<Link,Integer> linksMap,Link[] segmentCandi){
 		//first find the links at t0, then according the paper to find the segments candidate
@@ -372,9 +373,9 @@ public class TimedUpdate {
 		turnSet2Map(segments,tmpSegMap);
 		HashMap<Integer,Integer> lid_inc = new HashMap<Integer,Integer>();
 		for(int t=0;t<endTime-1;t++){
-			double [][] load = new double[26][26];
-			int[][] inc = new int[26][26];
-			int[][] flag = new int[26][26];
+			double [][] load = new double[numOfSwitch+1][numOfSwitch+1];
+			int[][] inc = new int[numOfSwitch+1][numOfSwitch+1];
+			int[][] flag = new int[numOfSwitch+1][numOfSwitch+1];
 			HashMap<int[], Integer> path_lid = new HashMap<int[],Integer>();
 			for(Map.Entry<Link,Integer> lEntry : linksMap.entrySet()){
 				Link link = lEntry.getKey();
@@ -406,7 +407,7 @@ public class TimedUpdate {
 						System.out.println("load "+load[from][to]+" "+ from+" "+to+" "+t+" "+tLF[1].getFlowid()+" "+inc[from][to]);*/
 					
 					if(load[from][to] > bandWidth[from][to] && flag[from][to]==1){
-						System.out.println("find congested links!");
+						//System.out.println("find congested links!");
 						for(Map.Entry<int[],Integer> pEntry : path_lid.entrySet()){
 							int[] p = pEntry.getKey();
 							if(p[0]==from&&p[1]==to){
@@ -486,7 +487,7 @@ public class TimedUpdate {
 						pastSeg[x].setEndTiming(pastSeg[x].getEndTiming()+inc);
 					}
 				}
-				System.out.println("find past segments!!!!!!");
+				//System.out.println("find past segments!!!!!!");
 				segments.add(pastSeg);
 			}
 			
@@ -653,7 +654,7 @@ public class TimedUpdate {
 				if(s2id == s1id ) continue;
 				//System.out.println(s1id+"&"+s2id);
 				if(isLinkEqual(s1Entry.getValue(), s2Entry.getValue(),3,linksLidMap)==1){
-					System.out.println("exclu:"+s1id+" "+s2id);
+				//	System.out.println("exclu:"+s1id+" "+s2id);
 					int min1=1000;
 					int min2=1000;
 					for(int a=0;a<links1.length;a++){
@@ -663,11 +664,11 @@ public class TimedUpdate {
 						if(links2[a]!=null&&links2[a].getStartTiming()<min1) min2 = links2[a].getStartTiming();
 					}
 					if(min1>min2){
-						System.out.println("remmmm1:"+s1id);
+					//	System.out.println("remmmm1:"+s1id);
 						remKey[rindex] = s1id;
 						rindex++;
 					}else if(min1<min2){
-						System.out.println("remmmm2:"+s2id);
+					//	System.out.println("remmmm2:"+s2id);
 						remKey[rindex] = s2id;
 						rindex++;
 					}
@@ -678,7 +679,7 @@ public class TimedUpdate {
 		for(int i=0;i<remKey.length;i++){
 			if(remKey[i]!=0){
 				segmentsMap.remove(remKey[i]);
-				System.out.println("excluuuuu!");
+				//System.out.println("excluuuuu!");
 			}
 		}
 		
@@ -695,7 +696,7 @@ public class TimedUpdate {
 				if(s2id == s1id ) continue;
 				//System.out.println(s1id+"&"+s2id);
 				if(isLinkEqual(s1Entry.getValue(), s2Entry.getValue(), 1,linksLidMap)==1){
-					System.out.println("merge:"+s1id+" "+s2id);
+				//	System.out.println("merge:"+s1id+" "+s2id);
 					int rem = Math.max(s1id,s2id);
 					remKey[rindex] = rem;
 					rindex++;
@@ -706,7 +707,7 @@ public class TimedUpdate {
 		for(int i=0;i<remKey.length;i++){
 			if(remKey[i]!=0){
 				segmentsMap.remove(remKey[i]);
-				System.out.println("mergeeeeeee!");
+			//	System.out.println("mergeeeeeee!");
 			}
 		}
 		
@@ -745,7 +746,6 @@ public class TimedUpdate {
 				if(choose == 1){
 					if(l1[i].getFrom()==l2[j].getFrom()&&l1[i].getTo()==l2[j].getTo()&&l1[i].getStartTiming()==l2[j].getStartTiming()&&l1[i].getEndTiming()==l2[j].getEndTiming()&&l1[i].getFlowid()==l2[j].getFlowid()&&l1[i].isStart()==l2[j].isStart()){
 						if((linksLidMap.containsKey(l1[i].getLinkid())&&linksLidMap.containsKey(l2[j].getLinkid()))){
-							System.out.println("wtf????????????");
 							break;
 						}	
 						same++;
@@ -754,7 +754,6 @@ public class TimedUpdate {
 				if(choose == 2){
 					if(l1[i].getFrom()==l2[j].getFrom()&&l1[i].getTo()==l2[j].getTo()&&l1[i].getFlowid()==l2[j].getFlowid()&&l1[i].getStartTiming()!=l2[j].getStartTiming()&&l1[i].isStart()==l2[j].isStart()){
 						if((linksLidMap.containsKey(l1[i].getLinkid())&&linksLidMap.containsKey(l2[j].getLinkid()))){
-							System.out.println("wtf!!!!!!!!!!!!!!!!!!!!!!!!");
 							break;
 						}	
 							same++;
@@ -791,7 +790,7 @@ public class TimedUpdate {
 				if(s2entry.getKey() == l1key) continue;
 				Link[]l2 = s2entry.getValue();
 				if(isLinkEqual(l1, l2, 2,linksLidMap)==1){   // exist a makes O(t-a) = O(a), exit the program
-					System.out.println("exit!:"+s1entry.getKey()+" "+s2entry.getKey());
+					//System.out.println("exit!:"+s1entry.getKey()+" "+s2entry.getKey());
 					return false;
 				}
 			}
@@ -1093,7 +1092,7 @@ public class TimedUpdate {
 			 Map.Entry<Link,Integer> tmp = list.get(i);
 			 Link link = tmp.getKey();
 			 int index = tmp.getValue();
-			 System.out.println("link:"+index+" from:"+link.getFrom()+" to:"+link.getTo()+" at:"+link.getStartTiming()+" to:"+link.getEndTiming()+" flow:"+link.getFlowid()+" isStart:"+link.isStart()+" linkid:"+link.getLinkid());
+			// System.out.println("link:"+index+" from:"+link.getFrom()+" to:"+link.getTo()+" at:"+link.getStartTiming()+" to:"+link.getEndTiming()+" flow:"+link.getFlowid()+" isStart:"+link.isStart()+" linkid:"+link.getLinkid());
 	        }  
 		 
 		 System.out.println("***************************");
@@ -1110,10 +1109,10 @@ public class TimedUpdate {
 			int key = showEntry.getKey();
 			for(int i=1;i<l.length;i++){
 				if(l[i]!=null){
-				System.out.println("segmentId: "+key+" linkid: "+l[i].getLinkid()+" from: "+l[i].from+" to: "+l[i].to+" startT: "+l[i].startTiming+" endT: "+l[i].endTiming+" flowid: "+l[i].flowid+" isStart: "+l[i].isStart()+" isEnd: "+l[i].isEnd());
+			//	System.out.println("segmentId: "+key+" linkid: "+l[i].getLinkid()+" from: "+l[i].from+" to: "+l[i].to+" startT: "+l[i].startTiming+" endT: "+l[i].endTiming+" flowid: "+l[i].flowid+" isStart: "+l[i].isStart()+" isEnd: "+l[i].isEnd());
 				}
 		}
-			System.out.println("#######");
+			//System.out.println("#######");
 		}
 	}
 	
@@ -1121,7 +1120,7 @@ public class TimedUpdate {
 		//print the dependency relation of segments
 		for(HashMap<Integer,Integer> tmpDep:dependRelationSet){
 			for(Map.Entry<Integer,Integer> depRelEntry : tmpDep.entrySet()){
-				System.out.println("sgement: "+depRelEntry.getKey()+" ---> segment: "+depRelEntry.getValue());
+				//System.out.println("sgement: "+depRelEntry.getKey()+" ---> segment: "+depRelEntry.getValue());
 			}
 		}
 		
@@ -1130,16 +1129,16 @@ public class TimedUpdate {
 	public static void printPaths(HashMap<Integer,Path> paths) {
 		for(Map.Entry<Integer,Path> pEntry : paths.entrySet()){
 			Path p = pEntry.getValue();
-			System.out.println("pathId: "+pEntry.getKey()+" from: "+p.getU()+" to: "+p.getV()+" capa: "+p.getCapacity()+" isStart: "+p.isStart()+" isEnd: "+p.isEnd());
+		//	System.out.println("pathId: "+pEntry.getKey()+" from: "+p.getU()+" to: "+p.getV()+" capa: "+p.getCapacity()+" isStart: "+p.isStart()+" isEnd: "+p.isEnd());
 		}
 	}
 	
 	public static void printDependecnyGraph(HashSet<PathSegmentRelation> dependencyG){
 		for(PathSegmentRelation psr : dependencyG){
 			if(psr.getRelation() == 0){
-				System.out.println("pid: "+psr.getPathId()+" ---> sid: "+psr.getSegmentId());
+				//System.out.println("pid: "+psr.getPathId()+" ---> sid: "+psr.getSegmentId());
 			}else{
-				System.out.println("sid: "+psr.getSegmentId()+" ---> pid: "+psr.getPathId());
+				//System.out.println("sid: "+psr.getSegmentId()+" ---> pid: "+psr.getPathId());
 			}
 		}
 	}
@@ -1156,7 +1155,7 @@ public class TimedUpdate {
 				}
 			}
 			if(x>2){
-				System.out.println(pid);
+				//System.out.println(pid);
 				System.out.println("**************************");
 			}
 		}
@@ -1184,6 +1183,9 @@ public class TimedUpdate {
 	
 	@SuppressWarnings("resource")
 	public static void main(String args[]) throws IOException{
+		int Tcase=0;
+		while(Tcase<1) {
+		long startTime=System.currentTimeMillis();//记录开始时间  
 		
 	//	int [][] flows = {{1,3,4,5},{1,2,5},{1,2,5},{1,3,2,4,5}}; //initial flow1 , final flow1, initial flow2 , final flow2 ....
 		
@@ -1191,8 +1193,8 @@ public class TimedUpdate {
 		//int [][] flows = new int[1000][25];
 		
 		int [][]flows = new int[10000][];
-		String filePath = "input_flow_100_useful.txt";
-
+		//String filePath = "input_flow_100_useful.txt";
+		String filePath = "input_flow_1000.txt";
 		BufferedReader br = new BufferedReader(new InputStreamReader(  
 	             new FileInputStream(filePath)));  
 		 int cnt=0;
@@ -1219,7 +1221,7 @@ public class TimedUpdate {
 		//double [] throughput={0,1,1,1};  // 0,throughput of flow1, throughput of flow2.....
 		double [] throughput = new double[cnt/2+1];
 		int throughtIndex = 1;
-		filePath = "throughput_100_useful.txt";
+		filePath = "throughput_1000.txt";
 		br = new BufferedReader(new InputStreamReader(  
 	             new FileInputStream(filePath)));  
 		 for (String line = br.readLine(); line != null; line = br.readLine()) {  
@@ -1228,8 +1230,9 @@ public class TimedUpdate {
 		    	throughtIndex++;
 		     }
 		 
-		 double[][] delay = new double[26][26];
-		 filePath = "delay.txt";
+		 double[][] delay = new double[numOfSwitch+1][numOfSwitch+1];
+		
+		 filePath = "delay_100.txt";
 			br = new BufferedReader(new InputStreamReader(  
 		             new FileInputStream(filePath)));  
 			 for (String line = br.readLine(); line != null; line = br.readLine()) {  
@@ -1249,7 +1252,7 @@ public class TimedUpdate {
 		}
 	     */
 		Topology topology = new Topology();
-		topology.init(25,6.3,1);
+		topology.init(100,6.3,1);
 		//int [][] topo = topology.getTopo();
 		//double [][] delay = topology.getDelay();
 		double [][] bandWidth = topology.getBandWidth();
@@ -1418,11 +1421,11 @@ public class TimedUpdate {
 					 if(f==true){
 							independentSegments[tmpCnt] = sid;
 							tmpCnt++;
-							System.out.println("the segment: "+sid+" is a independent segment at:t"+t);
+					//		System.out.println("the segment: "+sid+" is a independent segment at:t"+t);
 						}else{
 							dependentSegments[tmpCnt2] = sid;
 							tmpCnt2++;
-							System.out.println("the segment: "+sid+" is a dependent segment at:t"+t);
+					//		System.out.println("the segment: "+sid+" is a dependent segment at:t"+t);
 						}			 
 				}		
 			}
@@ -1436,13 +1439,13 @@ public class TimedUpdate {
 				System.out.println("program ends cause the update of independent segments is failed although it's impossible! ");
 				System.exit(0);
 			}else if(independentSegments.length>1&&independentSegments[1]!=0){
-					System.out.println("the segments after updating independent segments at t"+t);
+				//	System.out.println("the segments after updating independent segments at t"+t);
 					updateSegments(segmentsMap,independentSegments);
 					printsegments(segmentsMap);
-					System.out.println("the dependentGraph after updating independent segments at t"+t);
+				//	System.out.println("the dependentGraph after updating independent segments at t"+t);
 					printPaths(paths);
 					maxUt = calLinkUtlization(paths, bandWidth);
-					System.out.println("the max utiliztion at t"+t+" is: "+maxUt);
+				//	System.out.println("the max utiliztion at t"+t+" is: "+maxUt);
 				}
 			
 		
@@ -1468,17 +1471,17 @@ public class TimedUpdate {
 			
 			continueFlag = updateDependencyGraph(dependencyGraph, dependentSegments, paths, segmentsMap, throughput,bandWidth);
 			if(continueFlag == false){
-				System.out.println("program ends cause the update of dependent segments is failed, so the solution doesn't exist!");
+				//System.out.println("program ends cause the update of dependent segments is failed, so the solution doesn't exist!");
 				System.exit(0);
 			}else{
 				if(dependentSegments.length>1&&dependentSegments[1]!=0){
-					System.out.println("the segments after updating dependent segments at t"+t);
+					//System.out.println("the segments after updating dependent segments at t"+t);
 					updateSegments(segmentsMap,dependentSegments);
 					printsegments(segmentsMap);
-					System.out.println("the dependentGraph after updating dependent segments at t"+t);
+				//	System.out.println("the dependentGraph after updating dependent segments at t"+t);
 					printPaths(paths);
 					maxUt = calLinkUtlization(paths, bandWidth);
-					System.out.println("the max utiliztion at t"+t+" is: "+maxUt);
+				//	System.out.println("the max utiliztion at t"+t+" is: "+maxUt);
 				}
 			}
 		}
@@ -1486,6 +1489,17 @@ public class TimedUpdate {
 			System.out.println("program has found a solution, congratulation :):):)");
 		}
 		
+		long endTime=System.currentTimeMillis();//记录结束时间  
+		float excTime=(float)(endTime-startTime)/1000;  
+		System.out.println("执行时间："+excTime+"s");  
+
+		String filepath = "chronicle_runningtime.txt";
+		FileWriter fw1 = new FileWriter(filepath,true);
+		fw1.write(excTime+"\n");
+		fw1.flush();
+		
 		System.out.println("end");	
+		Tcase++;
+		}
 	}    
 }

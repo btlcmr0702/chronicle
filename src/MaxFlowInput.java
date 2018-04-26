@@ -11,7 +11,9 @@ import java.util.Queue;
 import java.util.Random;
 
 public class MaxFlowInput {
-	public static int [][] topology = new int[26][26];
+	private static int numOfSwitch = 100;
+	private static int numOfLink = 585;
+	public static int [][] topology = new int[numOfSwitch+1][numOfSwitch+1];
 	  
 	  
 	public static int getRandom(int min,int max){
@@ -91,11 +93,45 @@ public class MaxFlowInput {
         sum = (double)sum/(cnt*1.0-1);
         return sum ;
     }
+    
+    public static void gengerateDelay(int n) throws IOException {
+    	String filepath = "delay_"+n+".txt";
+		FileWriter fw1 = new FileWriter(filepath);		
+		
+    	 for(int i=0;i<n;i++) {
+			 for(int j=0;j<n;j++) {
+				 int d = getRandom(5,50);
+				 fw1.append(i+" "+j+" "+d+"\n");
+				 fw1.append(j+" "+i+" "+d+"\n");
+				 fw1.flush();
+			 }
+		 }
+    }
 
+    public static void generateTopo(int [][] topology) throws IOException {
+    	 int linkNum = 0;
+	     int tmpSrc = 0;
+	     int tmpDst = 0;
+	 	String filepath = "topology_"+numOfSwitch+".txt";
+		FileWriter fw1 = new FileWriter(filepath);		
+	     while(linkNum <= numOfLink) {
+	    	 tmpSrc = getRandom(1,numOfSwitch);
+	    	 tmpDst = getRandom(1,numOfSwitch);
+	    	 
+	    	 if(topology[tmpSrc][tmpDst]==0) {
+	    		 fw1.append(tmpSrc+" "+tmpDst+" "+1+"\n");
+				 fw1.flush();
+	    		 topology[tmpSrc][tmpDst]=1;
+	    		 topology[tmpDst][tmpSrc]=1;
+	    		 linkNum++;
+	    	 }
+
+	     }
+    }
 	public static boolean BFS(int src,int dst,int [][]topo,int[] pre){
         boolean flag = false;
 		Queue<Integer> queue = new LinkedList<Integer>();  
-        int [] visited = new int[26];
+        int [] visited = new int[numOfSwitch+1];
         queue.add(src);
         visited[src] = 1;
         pre[src] = -1;
@@ -138,8 +174,8 @@ public class MaxFlowInput {
 	}
 	
 	public static void printThroughput(int flowNum) throws IOException {
-		String filepath = "E:\\eclipseworkspace\\TimedUpdate\\flows_input\\throughput_"+flowNum+".txt";
-		FileWriter fw1 = new FileWriter(filepath,true);
+		String filepath = "throughput_"+flowNum+".txt";
+		FileWriter fw1 = new FileWriter(filepath);
 		for(int i=0;i<flowNum;i++){
 			double t = getRandom(1, 5)*1.0/10;
 			fw1.append(t+"\n");
@@ -148,7 +184,7 @@ public class MaxFlowInput {
 	}
 	
 	public static void printPath(int [] route,int flowNum) throws IOException{
-		String filepath = "E:\\eclipseworkspace\\TimedUpdate\\flows_input\\input_flow_"+flowNum+".txt";
+		String filepath = "input_flow_"+flowNum+".txt";
 		FileWriter fw1 = new FileWriter(filepath,true);
 		for(int i=route.length-1;i>=1;i--){
 			if(route[i]!=0)
@@ -161,14 +197,14 @@ public class MaxFlowInput {
 	}
 	
 	public static void findPath(int src,int dst,int [][]topo,int flownum) throws IOException {
-		int [][]topology = new int[26][26];
+		int [][]topology = new int[numOfSwitch+1][numOfSwitch+1];
 		for(int i = 0;i<topo.length;i++){
 			for(int j=0;j<topo[i].length;j++){
 				topology[i][j] = topo[i][j];
 			}
 		}
-		int[] pre = new int[26];
-		int[] route = new int[26];
+		int[] pre = new int[numOfSwitch+1];
+		int[] route = new int[numOfSwitch+1];
 		boolean result = BFS(src,dst,topology,pre);
 		if(result){
 			System.out.println("inital flow:");
@@ -185,8 +221,8 @@ public class MaxFlowInput {
 			}
 		}
 		
-		int[] pre2 = new int[26];
-		int[] route2 = new int[26];
+		int[] pre2 = new int[numOfSwitch+1];
+		int[] route2 = new int[numOfSwitch+1];
 		result = BFS(src,dst,topology,pre2);
 		if(result){
 			System.out.println("final flow:");
@@ -259,7 +295,7 @@ public class MaxFlowInput {
 	} 
 	
 	public static void calDelay(int[][]topo,double[][]coordinate) throws IOException {
-		double[][]delay = new double[26][26];
+		double[][]delay = new double[numOfSwitch+1][numOfSwitch+1];
 		double speed = (299792458/3)*2;
 		for(int i=1;i<26;i++){
 			for(int j=1;j<26;j++){
@@ -315,10 +351,10 @@ public class MaxFlowInput {
 	
 	public static void gengerateFlow(int num) throws IOException{
 		for(int i = 0;i<num;i++){
-	    	 int src = getRandom(1, 25);
-		     int dst = getRandom(1, 25);
+	    	 int src = getRandom(1, numOfSwitch);
+		     int dst = getRandom(1, numOfSwitch);
 		     while(dst == src){
-		    	 dst = getRandom(1, 25);
+		    	 dst = getRandom(1, numOfSwitch);
 		     }
 		     System.out.println("find path btw src:"+src+" and dst:"+dst);
 		     findPath(src, dst, topology,num);
@@ -326,7 +362,7 @@ public class MaxFlowInput {
 	     }
 	}
 	 public static void main(String args[]) throws IOException {
-		 String filePath = "topology.txt";
+		 String filePath = "topology_100.txt";
 
 		 BufferedReader br = new BufferedReader(new InputStreamReader(  
 	             new FileInputStream(filePath)));  
@@ -336,17 +372,21 @@ public class MaxFlowInput {
 	         if(s.length == 1){
 	        	 System.out.println("number of nodes: "+s[0]);
 	         }else{
-	        	 int src = Integer.parseInt(s[0]) + 1;
-	        	 int dst = Integer.parseInt(s[1]) + 1;
+	        	 int src = Integer.parseInt(s[0]) ;
+	        	 int dst = Integer.parseInt(s[1]) ;
 	        	 //System.out.println("src: "+src+" to dst: "+ dst);
 	        	 topology[src][dst] = 1;
 	        	 topology[dst][src] = 1;
 	         }    
 	     }
-	     
+	    
+		 
+		 
+		 
+	     /* 
 	     filePath = "coordinate.txt";
 	     br = new BufferedReader(new InputStreamReader(new FileInputStream(filePath)));
-	     double[][] coordinate   = new double[26][2];
+	   double[][] coordinate   = new double[26][2];
 	     int tIndex = 1;
 	     for (String line = br.readLine(); line != null; line = br.readLine()) {  
 	         String[] s = line.split(" ");
@@ -360,7 +400,7 @@ public class MaxFlowInput {
 	        	coordinate[tIndex][1] = latitude;
 	        	tIndex++;
 	         }    
-	     }
+	     }*/
 	     
 	 	/*double dis = getDistance(coordinate[1][1], coordinate[1][0],coordinate[2][1], coordinate[2][0]);
 		System.out.println(dis);*/
@@ -368,14 +408,16 @@ public class MaxFlowInput {
 	    // calDelay(topology, coordinate);
 	     
 	   //findPath(21, 1, topology);
+		 //  generateTopo(topology);
+
+	    int flowNum = 1000;
 	     
-	    int flowNum = 2500;
-	     
-	    gengerateFlow(flowNum);  //改这里的数字，表示生成的流的数目，放在文件里
+	//  gengerateFlow(flowNum);  //改这里的数字，表示生成的流的数目，放在文件里，每次都是追加，所以新生成之前需要清空原文件
 	     
 	   printThroughput(flowNum);
 	     
-	   
+	 //  gengerateDelay(numOfSwitch);
+
 	}
 	 
 }
